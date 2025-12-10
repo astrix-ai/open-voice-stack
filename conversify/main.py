@@ -180,6 +180,7 @@ def main():
         load_threshold=worker_config['load_threshold'],
         job_memory_limit_mb=worker_config['job_memory_limit_mb'],
         multiprocessing_context="spawn",  # Use spawn instead of forkserver to avoid segfault
+        port=worker_config.get('port', 5056),  # HTTP server port for debugging/tracing
     )
 
     # Run the CLI application
