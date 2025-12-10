@@ -40,7 +40,7 @@ vad:
   prefix_padding_duration: 0.5          # Padding duration (seconds) before detected speech
   max_buffered_speech: 60.0             # Maximum duration (seconds) of buffered speech
   activation_threshold: 0.5             # Threshold for voice activation detection
-  force_cpu: false                      # Force VAD to run on CPU instead of GPU
+  force_cpu: true                       # Force VAD to run on CPU (onnxruntime-gpu not installed)
   sample_rate: 16000  
 
 vision:

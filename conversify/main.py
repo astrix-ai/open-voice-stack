@@ -179,6 +179,7 @@ def main():
         job_memory_warn_mb=worker_config['job_memory_warn_mb'],
         load_threshold=worker_config['load_threshold'],
         job_memory_limit_mb=worker_config['job_memory_limit_mb'],
+        multiprocessing_context="spawn",  # Use spawn instead of forkserver to avoid segfault
     )
 
     # Run the CLI application
