@@ -21,7 +21,7 @@ from livekit.agents import (
 from livekit.plugins import silero
 from livekit.agents.types import NOT_GIVEN
 from livekit.plugins import noise_cancellation
-from livekit.plugins.turn_detector.multilingual import MultilingualModel
+# MultilingualModel imported conditionally below based on config
 
 from .models.tts import KokoroTTS
 from .models.stt import WhisperSTT
@@ -83,12 +83,18 @@ async def entrypoint(ctx: JobContext, config: Dict[str, Any]):
         return
 
     # Setup the AgentSession with configured plugins
+    # Only import turn detector if needed to avoid registering inference runner
+    turn_detection = NOT_GIVEN
+    if config['agent']['use_eou']:
+        from livekit.plugins.turn_detector.multilingual import MultilingualModel
+        turn_detection = MultilingualModel()
+    
     session = AgentSession(
         vad=vad,
         llm=OpenaiLLM(client=llm_client, config=config), 
         stt=WhisperSTT(config=config),
         tts=KokoroTTS(config=config),
-        turn_detection=MultilingualModel() if config['agent']['use_eou'] else NOT_GIVEN
+        turn_detection=turn_detection
     )
     logger.info("AgentSession created.")
 
