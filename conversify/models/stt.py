@@ -176,10 +176,12 @@ class WhisperSTT(stt.STT):
         try:
             logger.info(f"Received audio, transcribing to text")
             options = self._sanitize_options(language=language)
-            audio_data = rtc.combine_audio_frames(buffer).to_wav_bytes()
             
-            # Convert WAV to numpy array
-            audio_array = np.frombuffer(audio_data, dtype=np.int16).astype(np.float32) / 32768.0
+            # Combine audio frames and get raw samples
+            combined_frame = rtc.combine_audio_frames(buffer)
+            
+            # Get the raw audio data as numpy array
+            audio_array = np.frombuffer(combined_frame.data, dtype=np.int16).astype(np.float32) / 32768.0
             
             with find_time('STT_inference'):
                 segments, info = self._model.transcribe(
