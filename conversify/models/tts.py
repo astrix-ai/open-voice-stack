@@ -173,24 +173,22 @@ class KokoroTTSStream(tts.ChunkedStream):
             timeout=httpx.Timeout(30, connect=self._conn_options.timeout),
         )
 
-        request_id = utils.shortuuid()
-
-        audio_bstream = utils.audio.AudioByteStream(
-            sample_rate=TTS_SAMPLE_RATE,
-            num_channels=TTS_CHANNELS,
-        )
-
         logger.info(f"Kokoro -> converting text to audio")
 
         try:
             with find_time('TTS_inferencing'):
                 async with oai_stream as stream:
+                    output_emitter.initialize(
+                        request_id=stream.request_id or utils.shortuuid(),
+                        sample_rate=TTS_SAMPLE_RATE,
+                        num_channels=TTS_CHANNELS,
+                        mime_type="audio/pcm",
+                    )
+
                     async for data in stream.iter_bytes():
-                        for frame in audio_bstream.write(data):
-                            output_emitter.push(frame)
-                    # Flush any remaining data in the buffer
-                    for frame in audio_bstream.flush():
-                        output_emitter.push(frame)
+                        output_emitter.push(data)
+
+                output_emitter.flush()
 
         except openai.APITimeoutError:
             raise APITimeoutError()
