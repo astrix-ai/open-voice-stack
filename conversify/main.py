@@ -179,7 +179,7 @@ def main():
         job_memory_warn_mb=worker_config['job_memory_warn_mb'],
         load_threshold=worker_config['load_threshold'],
         job_memory_limit_mb=worker_config['job_memory_limit_mb'],
-        multiprocessing_context="spawn",  # Use spawn instead of forkserver to avoid segfault
+        multiprocessing_context="forkserver",  # Use forkserver for compatibility with sglang
         port=worker_config.get('port', 5056),  # HTTP server port for debugging/tracing
         initialize_process_timeout=worker_config.get('initialize_process_timeout', 120.0),  # Allow more time for model loading
     )
