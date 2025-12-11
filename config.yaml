@@ -59,7 +59,8 @@ worker:
   job_memory_warn_mb: 1900              
   load_threshold: 1.0                   
   job_memory_limit_mb: 10000
-  port: 5056        
+  port: 5056
+  initialize_process_timeout: 120.0     # Timeout for model loading (seconds)        
 
 logging:
   level: "DEBUG"                         
