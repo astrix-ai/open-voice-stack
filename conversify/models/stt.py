@@ -180,8 +180,22 @@ class WhisperSTT(stt.STT):
             # Combine audio frames and get raw samples
             combined_frame = rtc.combine_audio_frames(buffer)
             
-            # Get the raw audio data as numpy array
-            audio_array = np.frombuffer(combined_frame.data, dtype=np.int16).astype(np.float32) / 32768.0
+            # Get the raw audio data as numpy array (convert memoryview to bytes first)
+            audio_bytes = bytes(combined_frame.data)
+            audio_array = np.frombuffer(audio_bytes, dtype=np.int16).astype(np.float32) / 32768.0
+            
+            # Resample from source sample rate to 16000 Hz (Whisper's expected rate)
+            source_sample_rate = combined_frame.sample_rate
+            target_sample_rate = 16000
+            if source_sample_rate != target_sample_rate:
+                # Simple resampling using numpy interpolation
+                duration = len(audio_array) / source_sample_rate
+                target_length = int(duration * target_sample_rate)
+                audio_array = np.interp(
+                    np.linspace(0, len(audio_array), target_length),
+                    np.arange(len(audio_array)),
+                    audio_array
+                ).astype(np.float32)
             
             with find_time('STT_inference'):
                 segments, info = self._model.transcribe(
