@@ -158,8 +158,12 @@ class KokoroTTSStream(tts.ChunkedStream):
         self._client = client
         self._opts = opts
 
-    async def _run(self):
-        """Run the TTS synthesis."""
+    async def _run(self, output_emitter: tts.AudioEmitter):
+        """Run the TTS synthesis.
+        
+        Args:
+            output_emitter: Emitter to send synthesized audio frames
+        """
         oai_stream = self._client.audio.speech.with_streaming_response.create(
             input=self.input_text,
             model=self._opts.model,
@@ -183,20 +187,10 @@ class KokoroTTSStream(tts.ChunkedStream):
                 async with oai_stream as stream:
                     async for data in stream.iter_bytes():
                         for frame in audio_bstream.write(data):
-                            self._event_ch.send_nowait(
-                                tts.SynthesizedAudio(
-                                    frame=frame,
-                                    request_id=request_id,
-                                )
-                            )
+                            output_emitter.push(frame)
                     # Flush any remaining data in the buffer
                     for frame in audio_bstream.flush():
-                        self._event_ch.send_nowait(
-                            tts.SynthesizedAudio(
-                                frame=frame,
-                                request_id=request_id,
-                            )
-                        )
+                        output_emitter.push(frame)
 
         except openai.APITimeoutError:
             raise APITimeoutError()
