@@ -6,6 +6,7 @@ livekit-plugins-silero==1.1.7
 livekit-plugins-turn-detector==1.1.7
 python-dotenv
 soundfile
-sglang
-ctranslate2==4.4.0
+sglang==0.5.6
 nvidia-cudnn-cu12==9.16.0.29
+hf_transfer
+ctranslate2==4.4.0

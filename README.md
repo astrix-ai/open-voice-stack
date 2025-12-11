@@ -36,8 +36,27 @@ Conversify is a real‑time, low‑latency, voice- and vision-enabled AI assista
 1. **Clone the repository**
 
     ```bash
-    git clone https://github.com/taresh18/conversify.git
-    cd conversify
+    https://github.com/remsky/Kokoro-FastAPI
+    cd Kokoro-FastAPI
+    sudo apt update
+    sudo apt-get install espeak-ng
+    uv venv
+    source .venv/bin/activate
+    ./start-gpu.sh
+
+    git clone https://github.com/astrix-ai/open-voice-stack.git
+    cd open-voice-stack
+    uv venv
+    source .venv/bin/activate
+    xargs -L 1 uv pip install < requirements.txt
+    cp .env.example .env.local
+    nano .env.local
+
+    chmod +x ./scripts/run_llm.sh
+    ./scripts/run_llm.sh
+
+    python -m conversify.main download-files
+    python -m conversify.main
     ```
 
 2. **Create a virtual environment** (recommended)
