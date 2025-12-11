@@ -182,6 +182,7 @@ def main():
         multiprocessing_context="forkserver",  # Use forkserver for compatibility with sglang
         port=worker_config.get('port', 5056),  # HTTP server port for debugging/tracing
         initialize_process_timeout=worker_config.get('initialize_process_timeout', 120.0),  # Allow more time for model loading
+        num_idle_processes=1,  # Reduce idle processes to speed up startup
     )
 
     # Run the CLI application
